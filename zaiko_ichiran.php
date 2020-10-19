@@ -28,13 +28,11 @@ $dsn="mysql:dbname={$db_name};host={$host};charset=utf8";
 try{
 	$pdo=new PDO($dsn,$user_name,$passord);
 }catch(PDOException $e){
-	echo ('db connect error');
 	exit;
 }
 //⑦書籍テーブルから書籍情報を取得するSQLを実行する。また実行結果を変数に保存する
-$sql="SELECT * FROM books";
-$query=$pdo->query($sql);
-if(!$query) exit($sql);
+	$sql="SELECT * FROM books";
+	$query=$pdo->query($sql);
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -52,6 +50,8 @@ if(!$query) exit($sql);
 			<!-- エラーメッセージ表示 -->
 			<div id="error">
 				<?php
+				session_start();
+				session_regenerate_id(true);
 				/*
 				 * ⑧SESSIONの「success」にメッセージが設定されているかを判定する。
 				 * 設定されていた場合はif文の中に入る。
@@ -95,15 +95,14 @@ if(!$query) exit($sql);
 						//⑩SQLの実行結果の変数から1レコードのデータを取り出す。レコードがない場合はループを終了する。
 						//while(/* ⑩の処理を書く */){
 							//⑪extract変数を使用し、1レコードのデータを渡す。
-
-							//echo "<tr id='book'>";
-							//echo "<td id='check'><input type='checkbox' name='books[]'value="./* ⑫IDを設定する */."></td>";
-							//echo "<td id='id'>/* ⑬IDを表示する */</td>";
-							//echo "<td id='title'>/* ⑭titleを表示する */</td>";
-							//echo "<td id='author'>/* ⑮authorを表示する */</td>";
-							//echo "<td id='date'>/* ⑯salesDateを表示する */</td>";
-							//echo "<td id='price'>/* ⑰priceを表示する */</td>";
-							//echo "<td id='stock'>/* ⑱stockを表示する */</td>";
+							echo "<tr id='book'>";
+							echo "<td id='check'><input type='checkbox' name='books[]'value='{$extract['id']}'></td>";
+							echo "<td >{$extract['id']}</td>".PHP_EOL;
+							echo "<td >{$extract['title']}</td>".PHP_EOL;
+							echo "<td >{$extract['author']}</td>".PHP_EOL;
+							echo "<td >{$extract['salesDate']}</td>".PHP_EOL;
+							echo "<td >{$extract['price']}</td>".PHP_EOL;
+							echo "<td >{$extract['stock']}</td>".PHP_EOL;
 
 							echo "</tr>";
 						//}
