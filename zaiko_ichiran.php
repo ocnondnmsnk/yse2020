@@ -21,7 +21,6 @@ session_start();
 
 //(5)データベースへ接続し、接続情報を変数に保存する
 //(6)データベースで使用する文字コードを「UTF8」にする
-
 $db_name = 'zaiko2020_yse';
 $host = 'localhost';
 $user_name = 'zaiko2020_yse';
@@ -36,8 +35,6 @@ try {
 //(7)書籍テーブルから書籍情報を取得するSQLを実行する。また実行結果を変数に保存する
 $sql = 'SELECT * FROM books;';
 $query = $pdo->query($sql);
-
-
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -55,6 +52,8 @@ $query = $pdo->query($sql);
 			<!-- エラーメッセージ表示 -->
 			<div id="error">
 				<?php
+				session_start();
+				session_regenerate_id(true);
 				/*
 				 * (8)SESSIONの「success」にメッセージが設定されているかを判定する。
 				 * 設定されていた場合はif文の中に入る。
