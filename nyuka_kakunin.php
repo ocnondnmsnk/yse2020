@@ -9,6 +9,9 @@
 */
 
 //①セッションを開始する
+session_start();
+session_regenerate_id(true);
+
 
 function getByid($id,$con){
 	/* 
@@ -16,8 +19,10 @@ function getByid($id,$con){
 	 * その際にWHERE句でメソッドの引数の$idに一致する書籍のみ取得する。
 	 * SQLの実行結果を変数に保存する。
 	 */
-
+	$sql = "SELECT * FROM books WHERE id ={$id}";
+	$query =$con->query($sql);
 	//③実行した結果から1レコード取得し、returnで値を返す。
+	return $query ->fetch(PDO::FETCH_ASSOC);
 }
 
 function updateByid($id,$con,$total){
@@ -26,6 +31,9 @@ function updateByid($id,$con,$total){
 	 * 引数で受け取った$totalの値で在庫数を上書く。
 	 * その際にWHERE句でメソッドの引数に$idに一致する書籍のみ取得する。
 	 */
+	$SQL_update = ' UPDATE books WHERE id ={$id} ';
+	$query =$con->query($sql);
+	$total = $query ->fetch(PDO::FETCH_ASSOC);
 }
 
 //⑤SESSIONの「login」フラグがfalseか判定する。「login」フラグがfalseの場合はif文の中に入る。
@@ -37,11 +45,23 @@ function updateByid($id,$con,$total){
 //⑧データベースへ接続し、接続情報を変数に保存する
 
 //⑨データベースで使用する文字コードを「UTF8」にする
+$db_name = 'zaiko2020_yse';
+$host = 'localhost';
+$user_name = 'zaiko2020_yse';
+$password ='2020zaiko';
+$dsn = "mysql:dbname={$db_name};host={$host}; charset = utf8 ";
 
+try {
+		$pdo = new PDO($dsn, $user_name, $password);
+	
+} catch (PDOException $e) {
+	
+		exit;
+}
 //⑩書籍数をカウントするための変数を宣言し、値を0で初期化する
-
+$price =0;
 //⑪POSTの「books」から値を取得し、変数に設定する。
-//foreach(/* ⑪の処理を書く */){
+foreach($_POST['books'] as $book_id){
 	/*
 	 * ⑫POSTの「stock」について⑩の変数の値を使用して値を取り出す。
 	 * 半角数字以外の文字が設定されていないかを「is_numeric」関数を使用して確認する。

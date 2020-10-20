@@ -14,9 +14,11 @@
  * ①session_status()の結果が「PHP_SESSION_NONE」と一致するか判定する。
  * 一致した場合はif文の中に入る。
  */
-//if (/* ①.の処理を行う */) {
-	//②セッションを開始する
-//}
+if (session_status() == PHP_SESSION_NONE) {
+	session_start();
+	session_regenerate_id(true);
+
+ }
 
 
 //③SESSIONの「login」フラグがfalseか判定する。「login」フラグがfalseの場合はif文の中に入る。
@@ -28,7 +30,7 @@
 //⑥データベースへ接続し、接続情報を変数に保存する
 
 //⑦データベースで使用する文字コードを「UTF8」にする
-$db_name = 'zaiko2020_yse';
+	$db_name = 'zaiko2020_yse';
 	$host = 'localhost';
 	$user_name = 'zaiko2020_yse';
 	$password ='2020zaiko';

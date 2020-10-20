@@ -98,15 +98,14 @@ $query = $pdo->query($sql);
 						while ($extract = $query->fetch(PDO::FETCH_ASSOC)){ /* ⑩の処理を書く */
 							//(11)extract変数を使用し、1レコードのデータを渡す。
 
-							echo "<tr>" . PHP_EOL;
-							echo "<td><input type='checkbox' name='books[]'value='{$extract['id']}'></td>"; /* ⑫IDを設定する */
-							echo "<td>{extract['id']}</td>" . PHP_EOL; /* ⑬IDを表示する */
-							echo "<td>{extract['title']}</td>" . PHP_EOL; /* ⑭titleを表示する */
-							echo "<td>{extract['author']}</td>" . PHP_EOL; /* ⑮authorを表示する */
-							echo "<td>{extract['salesDate']}</td>" . PHP_EOL; /* ⑯salesDateを表示する */
-							echo "<td>{extract['price']}</td>" . PHP_EOL; /* ⑰priceを表示する */
-							echo "<td>{extract['stock']}</td>" . PHP_EOL; /* ⑱stockを表示する */
-							echo "</tr>" . PHP_EOL;
+							echo "<tr id='book'>";
+							echo "<td id='check'><input type='checkbox' name='books[]'value='{$extract['id']}'></td>";
+							echo "<td >{$extract['id']}</td>".PHP_EOL;
+							echo "<td >{$extract['title']}</td>".PHP_EOL;
+							echo "<td >{$extract['author']}</td>".PHP_EOL;
+							echo "<td >{$extract['salesDate']}</td>".PHP_EOL;
+							echo "<td >{$extract['price']}</td>".PHP_EOL;
+							echo "<td >{$extract['stock']}</td>".PHP_EOL;
 						}
 						?>
 					</tbody>
