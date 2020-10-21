@@ -16,6 +16,7 @@
 	$name='';
 	$pass='';
 	$error_messgae='';
+	$message='';
 /*
  * ②ログインボタンが押されたかを判定する。
  * 押されていた場合はif文の中の処理を行う
@@ -38,24 +39,28 @@ if (isset($_POST['decision'])&&$_POST['decision']==1){
 
 //⑦名前が入力されているか判定する。入力されていた場合はif文の中に入る
 //⑧名前に「yse」、パスワードに「2019」と設定されているか確認する。設定されていた場合はif文の中に入る
-if ($name=='yse' && $pass=='2019'){
+if (!empty($_POST["name"])) {
+	if ($name=='yse' && $pass=='2019'){
 //⑨SESSIONに名前を設定し、SESSIONの「login」フラグをtrueにする
 	$_SESSION['name']=$name;
 	$_SESSION['login'] = true;
 //⑩在庫一覧画面へ遷移する
 	header('location:zaiko_ichiran.php');
 	
-} else {
+	} else {
 //⑪名前もしくはパスワードが間違っていた場合は、「ユーザー名かパスワードが間違っています」という文言をメッセージを入れる変数に設定する
 	$message = 'ユーザー名かパスワードが間違ってます';
+	}
 }
 
 
 //⑫SESSIONの「error2」に値が入っているか判定する。入っていた場合はif文の中に入る
-// if ($_SESSION==error2) {
-// 	//⑬SESSIONの「error2」の値をエラーメッセージを入れる変数に設定する。
-// 	//⑭SESSIONの「error2」にnullを入れる。
-// }
+if (!empty($_SESSION['error2'])) {
+	//⑬SESSIONの「error2」の値をエラーメッセージを入れる変数に設定する。
+		$_SESSION['error2'] = $errormsg;
+	//⑭SESSIONの「error2」にnullを入れる。
+		$_SESSION['error2'] = null;
+	}
 ?>
 <!DOCTYPE html>
 <html lang="ja">

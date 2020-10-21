@@ -1,40 +1,45 @@
 <?php
-/*
+/* 
 【機能】
 書籍テーブルより書籍情報を取得し、画面に表示する。
 商品をチェックし、ボタンを押すことで入荷、出荷が行える。
 ログアウトボタン押下時に、セッション情報を削除しログイン画面に遷移する。
-
 【エラー一覧（エラー表示：発生条件）】
 入荷する商品が選択されていません：商品が一つも選択されていない状態で入荷ボタンを押す
 出荷する商品が選択されていません：商品が一つも選択されていない状態で出荷ボタンを押す
 */
 
-//(1)セッションを開始する
+//①セッションを開始する
 session_start();
 
-//(2)SESSIONの「login」フラグがfalseか判定する。「login」フラグがfalseの場合はif文の中に入る。
-// if (/* (2)の処理を書く */){
-	//(3)SESSIONの「error2」に「ログインしてください」と設定する。
-	//(4)ログイン画面へ遷移する。
-// }
-
-//(5)データベースへ接続し、接続情報を変数に保存する
-//(6)データベースで使用する文字コードを「UTF8」にする
-$db_name = 'zaiko2020_yse';
-$host = 'localhost';
-$user_name = 'zaiko2020_yse';
-$password = '2020zaiko';
-$dsn = "mysql:dbname={$db_name};host={$host}; charset=utf8";
-try {
-	$pdo = new PDO($dsn, $user_name, $password);
-} catch (PDOException $e) {
-	exit;
+//②SESSIONの「login」フラグがfalseか判定する。「login」フラグがfalseの場合はif文の中に入る。
+if ($_SESSION['login'] == false){
+	//③SESSIONの「error2」に「ログインしてください」と設定する。
+	$_SESSION['error2'] = 'ログインしてください';
+	//④ログイン画面へ遷移する。
+	header( "Location: login.php" ) ;
 }
 
-//(7)書籍テーブルから書籍情報を取得するSQLを実行する。また実行結果を変数に保存する
-$sql = 'SELECT * FROM books;';
-$query = $pdo->query($sql);
+//⑤データベースへ接続し、接続情報を変数に保存する
+$host = 'localhost';
+$user_name = 'root';
+$db_name = 'zaiko2020_yse';
+$password = '';
+$mysqli = new mysqli($host, $user_name, $password, $db_name);
+
+if ($mysqli->connect_error) {
+    echo $mysqli->connect_error;
+    exit();
+} else {
+    //echo 'ok' . PHP_EOL;
+	//⑥データベースで使用する文字コードを「UTF8」にする
+	$mysqli->set_charset('utf8');
+}
+
+//⑦書籍テーブルから書籍情報を取得するSQLを実行する。また実行結果を変数に保存する
+$sql = "SELECT * FROM books";
+$bookdate = $mysqli->query($sql);
+
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -52,18 +57,17 @@ $query = $pdo->query($sql);
 			<!-- エラーメッセージ表示 -->
 			<div id="error">
 				<?php
-				session_start();
-				session_regenerate_id(true);
 				/*
-				 * (8)SESSIONの「success」にメッセージが設定されているかを判定する。
+				 * ⑧SESSIONの「success」にメッセージが設定されているかを判定する。
 				 * 設定されていた場合はif文の中に入る。
-				 */
-				// if(/* (8)の処理を書く */){
-					//(9)SESSIONの「success」の中身を表示する。
-				// }
+				 */ 
+				if(isset($_SESSION["success"])){
+					//⑨SESSIONの「success」の中身を表示する。
+					echo $_SESSION["success"];
+				}
 				?>
 			</div>
-
+			
 			<!-- 左メニュー -->
 			<div id="left">
 				<p id="ninsyou_ippan">
@@ -94,19 +98,23 @@ $query = $pdo->query($sql);
 					</thead>
 					<tbody>
 						<?php
-						//(10)SQLの実行結果の変数から1レコードのデータを取り出す。レコードがない場合はループを終了する。
-						while ($extract = $query->fetch(PDO::FETCH_ASSOC)){ /* ⑩の処理を書く */
-							//(11)extract変数を使用し、1レコードのデータを渡す。
+						//⑩SQLの実行結果の変数から1レコードのデータを取り出す。レコードがない場合はループを終了する。
+						while($row = $bookdate->fetch_assoc()){
+							//⑪extract変数を使用し、1レコードのデータを渡す。
+							//$extract = $extract->get($id);
+							// extract($id);
 
 							echo "<tr id='book'>";
-							echo "<td id='check'><input type='checkbox' name='books[]'value='{$extract['id']}'></td>";
-							echo "<td >{$extract['id']}</td>".PHP_EOL;
-							echo "<td >{$extract['title']}</td>".PHP_EOL;
-							echo "<td >{$extract['author']}</td>".PHP_EOL;
-							echo "<td >{$extract['salesDate']}</td>".PHP_EOL;
-							echo "<td >{$extract['price']}</td>".PHP_EOL;
-							echo "<td >{$extract['stock']}</td>".PHP_EOL;
+							echo "<td id='check'><input type='checkbox' name='books[]'value='".$row['id']."'></td>";
+							echo "<td id='id'>".$row['id']."</td>";
+							echo "<td id='title'>".$row['title']."</td>";
+							echo "<td id='author'>".$row['author']."</td>";
+							echo "<td id='date'>".$row['salesDate']."</td>";
+							echo "<td id='price'>".$row['price']."</td>";
+							echo "<td id='stock'>".$row['stock']."</td>";
+							echo "</tr>";
 						}
+						$bookdate->close();
 						?>
 					</tbody>
 				</table>
