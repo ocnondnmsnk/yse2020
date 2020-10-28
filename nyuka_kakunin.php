@@ -55,13 +55,14 @@ if ($mysqli->connect_error) {
 	echo $mysqli->connect_error;
 	exit();
 } else {
-	//echo 'ok' . PHP_EOL;
+	
 	//⑨データベースで使用する文字コードを「UTF8」にする
 	$mysqli->set_charset('utf8');
+	echo 'ok' . PHP_EOL;
 }
 
 //⑩書籍数をカウントするための変数を宣言し、値を0で初期化する
-$book_quantity = 0;
+$book_count = 0;
 
 //⑪POSTの「books」から値を取得し、変数に設定する。
 foreach ($_POST['books'] as $books) {
@@ -83,12 +84,10 @@ foreach ($_POST['books'] as $books) {
 	}
 
 	//⑯「getByid」関数を呼び出し、変数に戻り値を入れる。その際引数に⑪の処理で取得した値と⑧のDBの接続情報を渡す。
-	$book_data_1 = getByid($books, $mysqli)->fetch_assoc();
+	$book=getByid($book_id,$pdo);
 
 	//⑰ ⑯で取得した書籍の情報の「stock」と、⑩の変数を元にPOSTの「stock」から値を取り出し、足した値を変数に保存する。
-
-	$book_total = $book_data_1['stock'] + $_POST['stock'][$book_quantity];
-
+	$total_stock=$stock + $book['stock'];
 	//⑱ ⑰の値が100を超えているか判定する。超えていた場合はif文の中に入る。
 	if ($book_total > 100) {
 		//⑲SESSIONの「error」に「最大在庫数を超える数は入力できません」と設定する。
@@ -102,7 +101,7 @@ foreach ($_POST['books'] as $books) {
 	}
 
 	//㉒ ⑩で宣言した変数をインクリメントで値を1増やす。
-	$book_quantity++;
+	$book_count++;
 }
 
 // var_dump($_POST['add']);
@@ -112,7 +111,7 @@ foreach ($_POST['books'] as $books) {
 if (!empty($_POST['add'])) {
 	if ($_POST['add'] == 'ok') {
 		//㉔書籍数をカウントするための変数を宣言し、値を0で初期化する。
-		$number_of_books_1 = 0;
+		$count_of_books = 0;
 
 		//㉕POSTの「books」から値を取得し、変数に設定する。
 		foreach ($_POST['books'] as $book) {
@@ -120,13 +119,13 @@ if (!empty($_POST['add'])) {
 			$book_data_3 = getByid($book, $mysqli)->fetch_assoc();
 
 			//㉗ ㉖で取得した書籍の情報の「stock」と、㉔の変数を元にPOSTの「stock」から値を取り出し、足した値を変数に保存する。
-			$book_total_number = $book_data_3['stock'] + $_POST['stock'][$number_of_books_1];
+			$book_total_number = $book_data_3['stock'] + $_POST['stock'][$count_of_books_];
 
 			//㉘「updateByid」関数を呼び出す。その際に引数に㉕の処理で取得した値と⑧のDBの接続情報と㉗で計算した値を渡す。
 			updateByid($book, $mysqli, $book_total_number);
 
 			//㉙ ㉔で宣言した変数をインクリメントで値を1増やす。
-			$number_of_books_1++;
+			$count_of_books++;
 		}
 		//㉚SESSIONの「success」に「入荷が完了しました」と設定する。
 		$_SESSION['success'] = '入荷が完了しました。';
@@ -163,7 +162,7 @@ if (!empty($_POST['add'])) {
 					<tbody>
 						<?php
 						//㉜書籍数をカウントするための変数を宣言し、値を0で初期化する。
-						$number_of_books_2 = 0;
+						$count_of_books_1 = 0;
 
 						//㉝POSTの「books」から値を取得し、変数に設定する。
 						foreach ($_POST['books'] as $post_book) {
@@ -175,13 +174,13 @@ if (!empty($_POST['add'])) {
 							<tr>
 								<td><?php echo $book_data_2['title']/* ㉟ ㉞で取得した書籍情報からtitleを表示する。 */; ?></td>
 								<td><?php echo $book_data_2['stock']/* ㊱ ㉞で取得した書籍情報からstockを表示する。 */; ?></td>
-								<td><?php echo $_POST['stock'][$number_of_books_2]/* ㊱ POSTの「stock」に設定されている値を㉜の変数を使用して呼び出す。 */; ?></td>
+								<td><?php echo $_POST['stock'][$count_of_books_1]/* ㊱ POSTの「stock」に設定されている値を㉜の変数を使用して呼び出す。 */; ?></td>
 							</tr>
 							<input type="hidden" name="books[]" value="<?php echo $post_book/* ㊲ ㉝で取得した値を設定する */; ?>">
-							<input type="hidden" name="stock[]" value='<?php echo $_POST['stock'][$number_of_books_2]/* ㊳POSTの「stock」に設定されている値を㉜の変数を使用して設定する。 */; ?>'>
+							<input type="hidden" name="stock[]" value='<?php echo $_POST['stock'][$count_of_books_1]/* ㊳POSTの「stock」に設定されている値を㉜の変数を使用して設定する。 */; ?>'>
 						<?php
 							//㊴ ㉜で宣言した変数をインクリメントで値を1増やす。
-							$number_of_books_2++;
+							$count_of_books_1++;
 						}
 						?>
 					</tbody>
