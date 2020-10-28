@@ -8,5 +8,5 @@ session_start();
 //②セッションを削除する。
 $_SESSION = array();
 //③ログイン画面へ遷移する。
-
+header( "Location: login.php" ) ;
 ?>

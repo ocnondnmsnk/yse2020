@@ -24,21 +24,18 @@ if ($_SESSION['login'] == false){
 $host = 'localhost';
 $user_name = 'root';
 $db_name = 'zaiko2020_yse';
-$password = '';
+$password = '2020zaiko';
 $mysqli = new mysqli($host, $user_name, $password, $db_name);
 
-if ($mysqli->connect_error) {
-    echo $mysqli->connect_error;
-    exit();
-} else {
-    //echo 'ok' . PHP_EOL;
-	//⑥データベースで使用する文字コードを「UTF8」にする
-	$mysqli->set_charset('utf8');
+try {
+	$pdo = new PDO($dsn, $user_name, $password);
+} catch (PDOException $e) {
+	exit;
 }
 
 //⑦書籍テーブルから書籍情報を取得するSQLを実行する。また実行結果を変数に保存する
 $sql = "SELECT * FROM books";
-$bookdate = $mysqli->query($sql);
+$query = $pdo->query($sql);
 
 ?>
 <!DOCTYPE html>
@@ -99,20 +96,17 @@ $bookdate = $mysqli->query($sql);
 					<tbody>
 						<?php
 						//⑩SQLの実行結果の変数から1レコードのデータを取り出す。レコードがない場合はループを終了する。
-						while($row = $bookdate->fetch_assoc()){
+						while ($extract = $query->fetch(PDO::FETCH_ASSOC)){
 							//⑪extract変数を使用し、1レコードのデータを渡す。
-							//$extract = $extract->get($id);
-							// extract($id);
-
-							echo "<tr id='book'>";
-							echo "<td id='check'><input type='checkbox' name='books[]'value='".$row['id']."'></td>";
-							echo "<td id='id'>".$row['id']."</td>";
-							echo "<td id='title'>".$row['title']."</td>";
-							echo "<td id='author'>".$row['author']."</td>";
-							echo "<td id='date'>".$row['salesDate']."</td>";
-							echo "<td id='price'>".$row['price']."</td>";
-							echo "<td id='stock'>".$row['stock']."</td>";
-							echo "</tr>";
+							echo "<tr>" . PHP_EOL;
+							echo "<td><input type='checkbox' name='books[]'value='{$extract['id']}'></td>"; 
+							echo "<td>{$extract['id']}</td>" . PHP_EOL; 
+							echo "<td>{$extract['title']}</td>" . PHP_EOL; 
+							echo "<td>{$extract['author']}</td>" . PHP_EOL; 
+							echo "<td>{$extract['salesDate']}</td>" . PHP_EOL; 
+							echo "<td>{$extract['price']}</td>" . PHP_EOL; 
+							echo "<td>{$extract['stock']}</td>" . PHP_EOL; 
+							echo "</tr>" . PHP_EOL;
 						}
 						$bookdate->close();
 						?>
