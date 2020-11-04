@@ -22,15 +22,15 @@ if ($_SESSION['login'] == false){
 
 //⑤データベースへ接続し、接続情報を変数に保存する
 $host = 'localhost';
-$user_name = 'root';
+$user_name = 'zaiko2020_yse';
 $db_name = 'zaiko2020_yse';
 $password = '2020zaiko';
-$mysqli = new mysqli($host, $user_name, $password, $db_name);
 
+$dsn = "mysql:dbname={$db_name};host={$host};charset=utf8";
 try {
-	$pdo = new PDO($dsn, $user_name, $password);
+    $pdo = new PDO($dsn, $user_name, $password);
 } catch (PDOException $e) {
-	exit;
+    exit;
 }
 
 //⑦書籍テーブルから書籍情報を取得するSQLを実行する。また実行結果を変数に保存する
@@ -108,7 +108,7 @@ $query = $pdo->query($sql);
 							echo "<td>{$extract['stock']}</td>" . PHP_EOL; 
 							echo "</tr>" . PHP_EOL;
 						}
-						$bookdate->close();
+						
 						?>
 					</tbody>
 				</table>
