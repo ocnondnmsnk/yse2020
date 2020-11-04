@@ -14,7 +14,7 @@
   	session_start();
 //①名前とパスワードを入れる変数を初期化する
 	$name='yse';
-	$password='2019';
+	$password='190234';
 	$error_message='';
 /*
  * ②ログインボタンが押されたかを判定する。
