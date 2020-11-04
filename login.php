@@ -15,7 +15,7 @@
 //①名前とパスワードを入れる変数を初期化する
 	$name='yse';
 	$password='2019';
-	$error_messgae='';
+	$error_message='';
 /*
  * ②ログインボタンが押されたかを判定する。
  * 押されていた場合はif文の中の処理を行う
@@ -32,7 +32,7 @@ if (isset($_POST['decision'])&&$_POST['decision']==1){
 		
 	} else {
 		//⑤名前かパスワードが入力されていない場合は、「名前かパスワードが未入力です」という文言をメッセージを入れる変数に設定する
-		$error_messgae='名前かパスワードが未入力です';
+		$error_message='名前かパスワードが未入力です';
 	}
 }
 
@@ -48,7 +48,7 @@ if (!empty($_POST["name"])) {
 	
 	} else {
 //⑪名前もしくはパスワードが間違っていた場合は、「ユーザー名かパスワードが間違っています」という文言をメッセージを入れる変数に設定する
-	$message = 'ユーザー名かパスワードが間違ってます';
+	$error_message = 'ユーザー名かパスワードが間違ってます';
 	}
 }
 
@@ -56,7 +56,7 @@ if (!empty($_POST["name"])) {
 //⑫SESSIONの「error2」に値が入っているか判定する。入っていた場合はif文の中に入る
 if (!empty($_SESSION['error2'])) {
 	//⑬SESSIONの「error2」の値をエラーメッセージを入れる変数に設定する。
-		$error_messgae=$_SESSION['error2'];
+		$error_message=$_SESSION['error2'];
 	//⑭SESSIONの「error2」にnullを入れる。
 		$_SESSION['error2'] = null;
 	}
@@ -73,7 +73,7 @@ if (!empty($_SESSION['error2'])) {
 		<h1>ログイン</h1>
 		<?php
 		//⑮エラーメッセージの変数に入っている値を表示する
-		echo "<div id='error'>", @$error_messgae, "</div>";
+		echo "<div id='error'>", @$error_message, "</div>";
 		
 		//⑯メッセージの変数に入っている値を表示する
 		//echo "<div id='msg'>", /* ⑯の変数を書く */, "</div>";
