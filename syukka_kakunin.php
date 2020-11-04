@@ -51,7 +51,7 @@ if ($_SESSION['login'] == false){
 $host = 'localhost';
 $user_name = 'root';
 $db_name = 'zaiko2020_yse';
-$password = '';
+$password = '2020zaiko';
 $mysqli = new mysqli($host, $user_name, $password, $db_name);
 
 if ($mysqli->connect_error) {
