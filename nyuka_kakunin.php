@@ -48,7 +48,7 @@ $password = '2020zaiko';
 
 $dsn = "mysql:dbname={$db_name};host={$host};charset=utf8";
 try {
-    $pdo = new PDO($dsn, $user_name, $passward);
+    $pdo = new PDO($dsn, $user_name, $password);
 } catch (PDOException $e) {
     exit;
 }
@@ -57,9 +57,9 @@ try {
 $book_count = 0;
 
 //⑪POSTの「books」から値を取得し、変数に設定する。
-foreach ($_POST['books'] as $books) {
+foreach ($_POST['books'] as $book_id) {
 	//⑫POSTの「stock」について⑩の変数の値を使用して値を取り出す。
-	$update_stock = $_POST['stock'][$book_quantity];
+	$update_stock = $_POST['stock'][$book_count];
 
 	// 半角数字以外の文字が設定されていないかを「is_numeric」関数を使用して確認する。
 	// 半角数字以外の文字が入っていた場合はif文の中に入る。
@@ -79,9 +79,9 @@ foreach ($_POST['books'] as $books) {
 	$book=getByid($book_id,$pdo);
 	
 	//⑰ ⑯で取得した書籍の情報の「stock」と、⑩の変数を元にPOSTの「stock」から値を取り出し、足した値を変数に保存する。
-	$total_stock=$stock + $book['stock'];
+	$total_stock=$update_stock + $book['stock'];
 	//⑱ ⑰の値が100を超えているか判定する。超えていた場合はif文の中に入る。
-	if ($book_stock > 100) {
+	if ($total_stock > 100) {
 		//⑲SESSIONの「error」に「最大在庫数を超える数は入力できません」と設定する。
 		$_SESSION['error'] = '最大在庫数を超える数は入力できません';
 
@@ -108,13 +108,13 @@ if (!empty($_POST['add'])) {
 		//㉕POSTの「books」から値を取得し、変数に設定する。
 		foreach ($_POST['books'] as $book) {
 			//㉖「getByid」関数を呼び出し、変数に戻り値を入れる。その際引数に㉕の処理で取得した値と⑧のDBの接続情報を渡す。
-			$book_data_3 = getByid($book, $mysqli)->fetch_assoc();
+			$book_data_3 = getByid($book, $pdo);
 
 			//㉗ ㉖で取得した書籍の情報の「stock」と、㉔の変数を元にPOSTの「stock」から値を取り出し、足した値を変数に保存する。
-			$book_total_number = $book_data_3['stock'] + $_POST['stock'][$count_of_books_];
+			$book_total_number = $book_data_3['stock'] + $_POST['stock'][$count_of_books];
 
 			//㉘「updateByid」関数を呼び出す。その際に引数に㉕の処理で取得した値と⑧のDBの接続情報と㉗で計算した値を渡す。
-			updateByid($book, $mysqli, $book_total_number);
+			updateByid($book, $pdo, $book_total_number);
 
 			//㉙ ㉔で宣言した変数をインクリメントで値を1増やす。
 			$count_of_books++;
@@ -161,7 +161,7 @@ if (!empty($_POST['add'])) {
 
 							// ㉞「getByid」関数を呼び出し、変数に戻り値を入れる。その際引数に㉜の処理で取得した値と⑧のDBの接続情報を渡す。
 							// $book_data = getByid($Number_of_books,$mysqli)->fetch_assoc();
-							$book_data_2 = getByid($post_book, $mysqli)->fetch_assoc();
+							$book_data_2 = getByid($post_book, $pdo);
 						?>
 							<tr>
 								<td><?php echo $book_data_2['title']/* ㉟ ㉞で取得した書籍情報からtitleを表示する。 */; ?></td>

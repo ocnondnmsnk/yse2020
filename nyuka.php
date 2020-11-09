@@ -12,11 +12,9 @@
 //  ①session_status()の結果が「PHP_SESSION_NONE」と一致するか判定する。
 //  * 一致した場合はif文の中に入る。
 //  */
-if (/* ①の処理を行う */(function_exists('session_status')
-	&& session_status() !== PHP_SESSION_ACTIVE) || !session_id()) {
-	
+if(session_status()== PHP_SESSION_NONE){
 // 	//②セッションを開始する
-session_start();
+	session_start();
 }
 
 
@@ -29,21 +27,21 @@ if ($_SESSION['login'] == false){
 }
 
 //⑥データベースへ接続し、接続情報を変数に保存する
-$host = 'localhost';
-$user_name = 'root';
-$db_name = 'zaiko2020_yse';
-$password = '';
-$mysqli = new mysqli($host, $user_name, $password, $db_name);
-
-if ($mysqli->connect_error) {
-    echo $mysqli->connect_error;
-    exit();
-} else {
 //⑦データベースで使用する文字コードを「UTF8」にする
-	$mysqli->set_charset('utf8');
+$host = 'localhost';
+$user_name = 'zaiko2020_yse';
+$db_name = 'zaiko2020_yse';
+$password = '2020zaiko';
+
+$dsn = "mysql:dbname={$db_name};host={$host};charset=utf8";
+try {
+    $pdo = new PDO($dsn, $user_name, $password);
+} catch (PDOException $e) {
+    exit;
 }
+
 //⑧POSTの「books」の値が空か判定する。空の場合はif文の中に入る。
-if(!$_POST['books']/* ⑧の処理を行う */){
+	if(!$_POST['books']/* ⑧の処理を行う */){
 // 	//⑨SESSIONの「success」に「入荷する商品が選択されていません」と設定する。
 	$_SESSION['success'] = '入荷する商品が選択されていません';
 // 	//⑩在庫一覧画面へ遷移する。
@@ -56,16 +54,13 @@ function getId($id,$con){
 	 * その際にWHERE句でメソッドの引数の$idに一致する書籍のみ取得する。
 	 * SQLの実行結果を変数に保存する。
 	 */
-	$sql = "SELECT * FROM books WHERE id = ".$id;
-	$bookdate = null;
-	if ($bookdate = $con->query($sql)) {
+	$sql = "SELECT * FROM books WHERE id = {$id}";
+	$query=$con->query($sql);
+	$tyusyutu=$query->fetch(PDO::FETCH_ASSOC);
 		//⑫実行した結果から1レコード取得し、returnで値を返す。
-		return $bookdate;
+	return $tyusyutu;
 	}
-	$bookdate->close();
 	
-
-}
 
 ?>
 <!DOCTYPE html>
@@ -122,22 +117,18 @@ function getId($id,$con){
 					/*
 					 * ⑮POSTの「books」から一つずつ値を取り出し、変数に保存する。
 					 */
-    				foreach($_POST['books'] as $book){
+    				foreach($_POST['books'] as $bookid){
 						// ⑯「getId」関数を呼び出し、変数に戻り値を入れる。その際引数に⑮の処理で取得した値と⑥のDBの接続情報を渡す。
-						// $getId_id = getId($book,$mysqli);
-						$getId_id = getId($book,$mysqli)->fetch_assoc();
-							// var_dump($row);
-						// }
-						// var_dump($getId_id["id"]);
+						$book=getId($bookid,$pdo);
 					?>
-					<input type="hidden" value="<?php echo $getId_id['id']/* ⑰ ⑯の戻り値からidを取り出し、設定する */;?>" name="books[]">
+					<input type="hidden" value="<?php echo $book['id']/* ⑰ ⑯の戻り値からidを取り出し、設定する */;?>" name="books[]">
 					<tr>
-						<td><?php echo $getId_id["id"]/* ⑱ ⑯の戻り値からidを取り出し、表示する */;?></td>
-						<td><?php echo $getId_id["title"]/* ⑲ ⑯の戻り値からtitleを取り出し、表示する */;?></td>
-						<td><?php echo $getId_id["author"]/* ⑳ ⑯の戻り値からauthorを取り出し、表示する */;?></td>
-						<td><?php echo $getId_id["salesDate"]/* ㉑ ⑯の戻り値からsalesDateを取り出し、表示する */;?></td>
-						<td><?php echo $getId_id["price"]/* ㉒ ⑯の戻り値からpriceを取り出し、表示する */;?></td>
-						<td><?php echo $getId_id["stock"]/* ㉓ ⑯の戻り値からstockを取り出し、表示する */;?></td>
+						<td><?php echo $book["id"]/* ⑱ ⑯の戻り値からidを取り出し、表示する */;?></td>
+						<td><?php echo $book["title"]/* ⑲ ⑯の戻り値からtitleを取り出し、表示する */;?></td>
+						<td><?php echo $book["author"]/* ⑳ ⑯の戻り値からauthorを取り出し、表示する */;?></td>
+						<td><?php echo $book["salesDate"]/* ㉑ ⑯の戻り値からsalesDateを取り出し、表示する */;?></td>
+						<td><?php echo $book["price"]/* ㉒ ⑯の戻り値からpriceを取り出し、表示する */;?></td>
+						<td><?php echo $book["stock"]/* ㉓ ⑯の戻り値からstockを取り出し、表示する */;?></td>
 						<td><input type='text' name='stock[]' size='5' maxlength='11' required></td>
 					</tr>
 					<?php
