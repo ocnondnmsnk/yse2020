@@ -12,43 +12,42 @@
  * ①session_status()の結果が「PHP_SESSION_NONE」と一致するか判定する。
  * 一致した場合はif文の中に入る。
  */
- if (/* ①の処理を行う */(function_exists('session_status')
- && session_status() !== PHP_SESSION_ACTIVE) || !session_id()) {
-// 	//②セッションを開始する
+if (session_status() == PHP_SESSION_NONE) {
 	session_start();
- }
-
-// //③SESSIONの「login」フラグがfalseか判定する。「login」フラグがfalseの場合はif文の中に入る。
-if ($_SESSION['login'] == false){
-	//③SESSIONの「error2」に「ログインしてください」と設定する。
-	$_SESSION['error2'] = 'ログインしてください';
-	//④ログイン画面へ遷移する。
-	header( "Location: login.php" ) ;
 }
+
+//③SESSIONの「login」フラグがfalseか判定する。「login」フラグがfalseの場合はif文の中に入る。
+if($_SESSION['login']==false){
+	//④SESSIONの「error2」に「ログインしてください」と設定する。
+	$_SESSION['error2']='ログインしてください';
+	//⑤ログイン画面へ遷移する。
+	header('location:login.php');
+}
+
 
 //⑥データベースへ接続し、接続情報を変数に保存する
-$host = 'localhost';
-$user_name = 'root';
-$db_name = 'zaiko2020_yse';
-$password = '';
-$mysqli = new mysqli($host, $user_name, $password, $db_name);
 
-if ($mysqli->connect_error) {
-    echo $mysqli->connect_error;
-    exit();
-} else {
 //⑦データベースで使用する文字コードを「UTF8」にする
-	$mysqli->set_charset('utf8');
+$host = 'localhost';
+$user_name = 'zaiko2020_yse';
+$db_name = 'zaiko2020_yse';
+$password = '2020zaiko';
+$dsn = "mysql:dbname={$db_name};host={$host};charset=utf8";
+try {
+    $pdo = new PDO($dsn, $user_name, $password);
+} catch (PDOException $e) {
+    exit;
 }
+
 //⑧POSTの「books」の値が空か判定する。空の場合はif文の中に入る。
-if(empty($_POST['books']) ){
-// 	//⑨SESSIONの「success」に「出荷する商品が選択されていません」と設定する。
-	$_SESSION['success'] = "出荷する商品が選択されていません";
-	echo $SESSION = $_POST['sussion'];
-// 	//⑩在庫一覧画面へ遷移する。
-header( "Location: zaiko_ichiran.php" ) ;
-exit ;
+if(empty($_POST['books'])){
+ 	//⑨SESSIONの「success」に「出荷する商品が選択されていません」と設定する。
+	$_SESSION['success']='出荷する商品が選択されていません';
+	//⑩在庫一覧画面へ遷移する。
+	header('location:zaiko_ichiran.php');
 }
+
+
 
 function getId($id,$con){
 	/* 
@@ -56,15 +55,11 @@ function getId($id,$con){
 	 * その際にWHERE句でメソッドの引数の$idに一致する書籍のみ取得する。
 	 * SQLの実行結果を変数に保存する。
 	 */
-	$sql = "SELECT * FROM books WHERE id = ".$id;
-
-	// 変数呼び出し
-	$bookdate = null;
-	if ($bookdate = $con->query($sql)) {
+	$sql = "SELECT * FROM books WHERE id = $id";
+	$query = $con->query($sql);
+	$extract = $query->fetch(PDO::FETCH_ASSOC);
 	//⑫実行した結果から1レコード取得し、returnで値を返す。
-	return $bookdate;
-	}
-	$bookdate->close();
+	return $extract;
 }
 ?>
 <!DOCTYPE html>
@@ -97,10 +92,10 @@ function getId($id,$con){
 		/*
 		 * ⑬SESSIONの「error」にメッセージが設定されているかを判定する。
 		 * 設定されていた場合はif文の中に入る。
-		*/
-		if(isset($_SESSION["error"])){
+		 */ 
+		if(!empty($_SESSION['error'])){
 			//⑭SESSIONの「error」の中身を表示する。
-		echo $_SESSION["error"];
+			echo ($_SESSION['error']);
 		}
 		?>
 		</div>
@@ -121,20 +116,18 @@ function getId($id,$con){
 				/*
 				 * ⑮POSTの「books」から一つずつ値を取り出し、変数に保存する。
 				 */
-				foreach($_POST['books'] as $book){
+				foreach($_POST['books'] as $books_){
 					// ⑯「getId」関数を呼び出し、変数に戻り値を入れる。その際引数に⑮の処理で取得した値と⑥のDBの接続情報を渡す。
-					// $getId_id = getId($book,$mysqli);
-					$getId_id = getId($book,$mysqli)->fetch_assoc();
-					// var_dump($book);
+					$book = getId($books_, $pdo);
 				?>
-				<input type="hidden" value="<?php echo $getId_id['id']/* ⑰ ⑯の戻り値からidを取り出し、設定する */;?>" name="books[]">
+				<input type="hidden" value="<?php echo $book['id'];?>" name="books[]">
 				<tr>
-				<td><?php echo $getId_id["id"]/* ⑱ ⑯の戻り値からidを取り出し、表示する */;?></td>
-					<td><?php echo $getId_id["title"]/* ⑲ ⑯の戻り値からtitleを取り出し、表示する */;?></td>
-					<td><?php echo $getId_id["author"]/* ⑳ ⑯の戻り値からauthorを取り出し、表示する */;?></td>
-					<td><?php echo $getId_id["salesDate"]/* ㉑ ⑯の戻り値からsalesDateを取り出し、表示する */;?></td>
-					<td><?php echo $getId_id["price"]/* ㉒ ⑯の戻り値からpriceを取り出し、表示する */;?></td>
-					<td><?php echo $getId_id["stock"]/* ㉓ ⑯の戻り値からstockを取り出し、表示する */;?></td>
+					<td><?php echo	$book['id'];?></td>
+					<td><?php echo	$book['title'];?></td>
+					<td><?php echo	$book['author'];?></td>
+					<td><?php echo	$book['salesDate'];?></td>
+					<td><?php echo	$book['price'];?></td>
+					<td><?php echo	$book['stock'];?></td>
 					<td><input type='text' name='stock[]' size='5' maxlength='11' required></td>
 				</tr>
 				<?php
